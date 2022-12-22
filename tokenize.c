@@ -1,22 +1,41 @@
 #include "shell.h"
-
 /**
-  * tokenize - a function that tokenizes a a character array into different
-  * strings.
-  * @buf: pointer to character array
-  * Return: array of strings
-  */
-char **tokenize(char *buf)
+ * tokenize - this function separate the string using a designed delimiter
+ * @data: a pointer to the program's data
+ * Return: an array of the different parts of the string
+ */
+void tokenize(data_of_program *data)
 {
-	int i;
-	char *str;
-	char **token = malloc(sizeof(char *) * 1024);
+	char *delimiter = " \t";
+	int i, j, counter = 2, length;
 
-	str = strtok(buf, " \n");
-	for (i = 0; str != NULL; i++)
+	length = str_length(data->input_line);
+	if (length)
 	{
-		token[i] = str;
-		str = strtok(NULL, " \n");
+		if (data->input_line[length - 1] == '\n')
+			data->input_line[length - 1] = '\0';
 	}
-	return (token);
+
+	for (i = 0; data->input_line[i]; i++)
+	{
+		for (j = 0; delimiter[j]; j++)
+		{
+			if (data->input_line[i] == delimiter[j])
+				counter++;
+		}
+	}
+
+	data->tokens = malloc(counter * sizeof(char *));
+	if (data->tokens == NULL)
+	{
+		perror(data->program_name);
+		exit(errno);
+	}
+	i = 0;
+	data->tokens[i] = str_duplicate(_strtok(data->input_line, delimiter));
+	data->command_name = str_duplicate(data->tokens[0]);
+	while (data->tokens[i++])
+	{
+		data->tokens[i] = str_duplicate(_strtok(NULL, delimiter));
+	}
 }
